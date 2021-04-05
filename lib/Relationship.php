@@ -509,6 +509,10 @@ class HasMany extends AbstractRelationship
 				$class = $this->class_name;
 				$relation = $class::table()->get_relationship($this->through);
 				$through_table = $relation->get_table();
+				
+				// This allows me to use badly structured tables that have unconvetional column names, very temporary fix for my solution might not work fully. Use at your own risk.
+				$this->foreign_key = $relation->foreign_key;
+				
 				$this->options['joins'] = $this->construct_inner_join_sql($through_table, true);
 
 				// reset keys
