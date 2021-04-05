@@ -14,6 +14,9 @@
         "pear/Log": "dev-master"
     },
     "autoload": {
-        "files": [ "ActiveRecord.php" ]
+        "files": [ "ActiveRecord.php" ],
+        "classmap": [
+            "lib/"
+        ]
     }
 }
