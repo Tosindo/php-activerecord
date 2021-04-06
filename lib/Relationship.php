@@ -592,6 +592,9 @@ class HasMany extends AbstractRelationship
 
 			// Save our model, as a "create" instantly saves after building
 			$record->save();
+			
+			// Append record to associate so you dont need to reload the model.
+			$this->append_record_to_associate($model, $record);
 		} else {
 			// Merge our attributes
 			$attributes = array_merge($relationship_attributes, $attributes);
