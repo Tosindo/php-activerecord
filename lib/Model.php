@@ -1649,6 +1649,10 @@ class Model
 	 */
 	public static function find_by_pk($values, $options)
 	{
+		// Avoids trying to count an uncountable variable, and removes the necessity to always call the function with an array.
+	    if (!is_array($values) && !($values instanceof Countable))
+            $values = [$values];
+		
 		if($values===null)
 		{
 			throw new RecordNotFound("Couldn't find ".get_called_class()." without an ID");
