@@ -163,7 +163,16 @@ abstract class AbstractRelationship implements InterfaceRelationship
 				$through_table = $class::table();
 			} else {
 				$class = $options['class_name'];
+				
+				// Forces the class to be followed by the namespace and avoids fatal errors.
+				if (isset($this->options['namespace']))
+				    $class = $this->options['namespace'].'\\'.$class;
+				
 				$relation = $class::table()->get_relationship($options['through']);
+				
+				// This allows me to use badly structured tables that have unconvetional column names, very temporary fix for my solution might not work fully. Use at your own risk.
+				$this->foreign_key = $relation->foreign_key;
+				
 				$through_table = $relation->get_table();
 			}
 			$options['joins'] = $this->construct_inner_join_sql($through_table, true);
