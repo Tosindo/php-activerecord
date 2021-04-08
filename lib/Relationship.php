@@ -147,21 +147,20 @@ abstract class AbstractRelationship implements InterfaceRelationship
 
 		if (!empty($includes))
 			$options['include'] = $includes;
-
+		
 		if (!empty($options['through'])) {
 			// save old keys as we will be reseting them below for inner join convenience
 			$pk = $this->primary_key;
 			$fk = $this->foreign_key;
 
 			$this->set_keys($this->get_table()->class->getName(), true);
+			
+			// This allows access to the through table at any time in the function, allowing to get the table name and any extra information we need to fix issues.
+			// Also sets the class variable correctly in case the class_name is not setup correctly in the through.
+			$through_table = $table->get_relationship($options["through"])->get_table();
+			$class = $through_table->class;
 
-			if (!isset($options['class_name'])) {
-				$class = classify($options['through'], true);
-				if (isset($this->options['namespace']) && !class_exists($class))
-					$class = $this->options['namespace'].'\\'.$class;
-
-				$through_table = $class::table();
-			} else {
+			if (isset($options['class_name'])) {
 				$class = $options['class_name'];
 				
 				// Forces the class to be followed by the namespace and avoids fatal errors.
@@ -182,6 +181,11 @@ abstract class AbstractRelationship implements InterfaceRelationship
 			// reset keys
 			$this->primary_key = $pk;
 			$this->foreign_key = $fk;
+			
+			
+			// This fixes the issues with hasmany through tables, that try to verify if the ID of the main table is equal to the ID of the end associate table.
+		        $query_key = $this->foreign_key[0];
+		        $options["select"] = "{$class::table()->get_fully_qualified_table_name()}.*, {$through_table->get_fully_qualified_table_name()}.$query_key";
 		}
 
 		$options = $this->unset_non_finder_options($options);
